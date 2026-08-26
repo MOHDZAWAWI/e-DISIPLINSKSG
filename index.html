@@ -12,14 +12,6 @@
             theme: {
                 extend: {
                     colors: {
-                        brand: {
-                            50: '#f0fdf4',
-                            100: '#dcfce7',
-                            600: '#16a34a',
-                            700: '#15803d',
-                            800: '#166534',
-                            900: '#14532d',
-                        },
                         navy: {
                             800: '#1e293b',
                             900: '#0f172a'
@@ -30,59 +22,23 @@
         }
     </script>
     
-    <!-- FontAwesome Icons -->
+    <!-- FontAwesome & Chart.js & html2pdf.js -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <!-- html2pdf.js for Direct PDF Generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
+    <!-- Firebase Compat SDK (Stabil & Berfungsi Tanpa Module Issue) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
     <style>
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #f8fafc;
-        }
-
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
         @media print {
-            body * {
-                visibility: hidden;
-            }
-            #printableReportArea, #printableReportArea * {
-                visibility: visible;
-            }
-            #printableReportArea {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                margin: 0;
-                padding: 20px;
-                background: white;
-                color: black;
-            }
-            .no-print {
-                display: none !important;
-            }
-        }
-
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+            body * { visibility: hidden; }
+            #printableReportArea, #printableReportArea * { visibility: visible; }
+            #printableReportArea { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 20px; background: white; color: black; }
+            .no-print { display: none !important; }
         }
     </style>
 </head>
@@ -92,15 +48,15 @@
     <header class="bg-navy-900 text-white sticky top-0 z-30 shadow-lg border-b border-slate-800 no-print">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
-                <div class="flex items-center space-x-3 cursor-pointer" onclick="window.switchTab('dashboard')">
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('dashboard')">
                     <div class="bg-red-600 p-2.5 rounded-xl shadow-md text-white font-bold flex items-center justify-center">
                         <i class="fa-solid fa-cloud-bolt text-xl"></i>
                     </div>
                     <div>
                         <div class="flex items-center space-x-2">
                             <span class="font-extrabold text-lg tracking-wider text-white">e-DISIPLIN CLOUD</span>
-                            <span class="bg-emerald-500/20 text-emerald-300 text-xs px-2 py-0.5 rounded-full border border-emerald-500/30 font-semibold" id="cloudStatus">
-                                <i class="fa-solid fa-circle text-[8px] animate-pulse mr-1 text-emerald-400"></i>Online
+                            <span class="bg-amber-500/20 text-amber-300 text-xs px-2 py-0.5 rounded-full border border-amber-500/30 font-semibold" id="cloudStatus">
+                                <i class="fa-solid fa-circle text-[8px] animate-pulse mr-1 text-amber-400"></i>Menyambung...
                             </span>
                         </div>
                         <p class="text-xs text-slate-400">SK Seri Gelugor • Firebase Real-Time</p>
@@ -108,7 +64,7 @@
                 </div>
 
                 <div class="flex items-center space-x-3">
-                    <button onclick="window.openNewCaseModal()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center space-x-2 transition shadow-md active:scale-95">
+                    <button type="button" onclick="openNewCaseModal()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center space-x-2 transition shadow-md active:scale-95 cursor-pointer">
                         <i class="fa-solid fa-plus text-xs"></i>
                         <span class="hidden sm:inline">Lapor Kes Baharu</span>
                     </button>
@@ -131,18 +87,17 @@
         <!-- Navigation Tabs -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-slate-200 pb-4">
             <nav class="flex space-x-2 bg-slate-200/70 p-1 rounded-xl text-sm font-medium w-fit">
-                <button id="tabBtn-dashboard" onclick="window.switchTab('dashboard')" class="px-4 py-2 rounded-lg transition text-slate-900 bg-white shadow-sm font-semibold">
+                <button id="tabBtn-dashboard" onclick="switchTab('dashboard')" class="px-4 py-2 rounded-lg transition text-slate-900 bg-white shadow-sm font-semibold">
                     <i class="fa-solid fa-chart-pie mr-1.5 text-red-600"></i> Ringkasan Utama
                 </button>
-                <button id="tabBtn-senarai" onclick="window.switchTab('senarai')" class="px-4 py-2 rounded-lg transition text-slate-600 hover:text-slate-900">
+                <button id="tabBtn-senarai" onclick="switchTab('senarai')" class="px-4 py-2 rounded-lg transition text-slate-600 hover:text-slate-900">
                     <i class="fa-solid fa-list-check mr-1.5 text-blue-600"></i> Rekod Kes (<span id="totalCasesCountBadge">0</span>)
                 </button>
             </nav>
 
-            <!-- Search Bar -->
             <div class="relative w-full sm:w-72">
                 <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                <input type="text" id="globalSearchInput" onkeyup="window.handleGlobalSearch()" placeholder="Cari No. Kes, Nama, Pelaku..." class="w-full pl-9 pr-4 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 shadow-sm transition">
+                <input type="text" id="globalSearchInput" onkeyup="handleGlobalSearch()" placeholder="Cari No. Kes, Nama, Pelaku..." class="w-full pl-9 pr-4 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 shadow-sm transition">
             </div>
         </div>
 
@@ -150,96 +105,61 @@
         <div id="view-dashboard" class="space-y-6">
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm hover:shadow-md transition">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Jumlah Kes</span>
-                        <span class="p-2 bg-slate-100 rounded-lg text-slate-600"><i class="fa-solid fa-folder-open text-base"></i></span>
-                    </div>
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Jumlah Kes</span>
                     <p class="text-2xl font-extrabold text-slate-900 mt-2" id="kpi-total">0</p>
-                    <p class="text-[11px] text-slate-500 mt-1"><i class="fa-solid fa-cloud mr-1"></i>Pangkalan Data Cloud</p>
+                    <p class="text-[11px] text-slate-500 mt-1">Firestore Cloud</p>
                 </div>
-
-                <div class="bg-white rounded-xl p-4 border border-red-200 shadow-sm hover:shadow-md transition bg-gradient-to-br from-red-50/50 to-white">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-semibold text-red-600 uppercase tracking-wider">Kes Baru</span>
-                        <span class="p-2 bg-red-100 rounded-lg text-red-600"><i class="fa-solid fa-circle-exclamation text-base"></i></span>
-                    </div>
+                <div class="bg-white rounded-xl p-4 border border-red-200 shadow-sm bg-gradient-to-br from-red-50/50 to-white">
+                    <span class="text-xs font-semibold text-red-600 uppercase tracking-wider">Kes Baru</span>
                     <p class="text-2xl font-extrabold text-red-600 mt-2" id="kpi-baru">0</p>
                     <p class="text-[11px] text-red-500 mt-1 font-medium">Perlu Siasatan</p>
                 </div>
-
-                <div class="bg-white rounded-xl p-4 border border-amber-200 shadow-sm hover:shadow-md transition bg-gradient-to-br from-amber-50/50 to-white">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-semibold text-amber-700 uppercase tracking-wider">Dalam Siasatan</span>
-                        <span class="p-2 bg-amber-100 rounded-lg text-amber-600"><i class="fa-solid fa-magnifying-glass-chart text-base"></i></span>
-                    </div>
+                <div class="bg-white rounded-xl p-4 border border-amber-200 shadow-sm bg-gradient-to-br from-amber-50/50 to-white">
+                    <span class="text-xs font-semibold text-amber-700 uppercase tracking-wider">Dalam Siasatan</span>
                     <p class="text-2xl font-extrabold text-amber-700 mt-2" id="kpi-siasatan">0</p>
                     <p class="text-[11px] text-amber-600 mt-1 font-medium">Tindakan Guru</p>
                 </div>
-
-                <div class="bg-white rounded-xl p-4 border border-emerald-200 shadow-sm hover:shadow-md transition bg-gradient-to-br from-emerald-50/50 to-white">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-semibold text-emerald-700 uppercase tracking-wider">Kes Selesai</span>
-                        <span class="p-2 bg-emerald-100 rounded-lg text-emerald-600"><i class="fa-solid fa-circle-check text-base"></i></span>
-                    </div>
+                <div class="bg-white rounded-xl p-4 border border-emerald-200 shadow-sm bg-gradient-to-br from-emerald-50/50 to-white">
+                    <span class="text-xs font-semibold text-emerald-700 uppercase tracking-wider">Kes Selesai</span>
                     <p class="text-2xl font-extrabold text-emerald-700 mt-2" id="kpi-selesai">0</p>
                     <p class="text-[11px] text-emerald-600 mt-1 font-medium">Rekod Ditutup</p>
                 </div>
-
-                <div class="bg-white rounded-xl p-4 border border-purple-200 shadow-sm hover:shadow-md transition bg-gradient-to-br from-purple-50/50 to-white col-span-2 md:col-span-1">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-semibold text-purple-700 uppercase tracking-wider">Kes Berat</span>
-                        <span class="p-2 bg-purple-100 rounded-lg text-purple-600"><i class="fa-solid fa-triangle-exclamation text-base"></i></span>
-                    </div>
+                <div class="bg-white rounded-xl p-4 border border-purple-200 shadow-sm bg-gradient-to-br from-purple-50/50 to-white col-span-2 md:col-span-1">
+                    <span class="text-xs font-semibold text-purple-700 uppercase tracking-wider">Kes Berat</span>
                     <p class="text-2xl font-extrabold text-purple-700 mt-2" id="kpi-berat">0</p>
-                    <p class="text-[11px] text-purple-600 mt-1 font-medium">Rujukan PPD / JPN</p>
+                    <p class="text-[11px] text-purple-600 mt-1 font-medium">Rujukan PPD/JPN</p>
                 </div>
             </div>
 
-            <!-- Charts -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
-                    <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center justify-between">
-                        <span><i class="fa-solid fa-chart-pie mr-2 text-red-600"></i>Pecahan Kategori Kes</span>
-                        <span class="text-xs font-normal text-slate-400">Peringkat Sekolah</span>
-                    </h3>
-                    <div class="relative h-56">
-                        <canvas id="categoryChart"></canvas>
-                    </div>
+                    <h3 class="text-sm font-bold text-slate-800 mb-4"><i class="fa-solid fa-chart-pie mr-2 text-red-600"></i>Pecahan Kategori Kes</h3>
+                    <div class="relative h-56"><canvas id="categoryChart"></canvas></div>
                 </div>
-
                 <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm lg:col-span-2">
-                    <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center justify-between">
-                        <span><i class="fa-solid fa-chart-column mr-2 text-blue-600"></i>Statistik Jenis Kesalahan</span>
-                    </h3>
-                    <div class="relative h-56">
-                        <canvas id="misconductChart"></canvas>
-                    </div>
+                    <h3 class="text-sm font-bold text-slate-800 mb-4"><i class="fa-solid fa-chart-column mr-2 text-blue-600"></i>Statistik Jenis Kesalahan</h3>
+                    <div class="relative h-56"><canvas id="misconductChart"></canvas></div>
                 </div>
             </div>
 
-            <!-- Recent Cases Table -->
             <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between">
                     <div>
-                        <h3 class="text-base font-bold text-slate-900">Senarai Kes Terkini (Masa Nyata)</h3>
-                        <p class="text-xs text-slate-500">Rekod disiplin tersimpan di cloud Firebase</p>
+                        <h3 class="text-base font-bold text-slate-900">Senarai Kes Terkini (Real-Time)</h3>
+                        <p class="text-xs text-slate-500">Pangkalan data awan SK Seri Gelugor</p>
                     </div>
-                    <button onclick="window.switchTab('senarai')" class="text-xs text-red-600 hover:text-red-700 font-semibold flex items-center gap-1 bg-red-50 px-3 py-1.5 rounded-lg border border-red-100 transition">
-                        Lihat Semua Kes <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                    </button>
+                    <button onclick="switchTab('senarai')" class="text-xs text-red-600 hover:text-red-700 font-semibold bg-red-50 px-3 py-1.5 rounded-lg border border-red-100">Lihat Semua Kes</button>
                 </div>
-
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="bg-slate-50 text-[11px] font-bold text-slate-500 uppercase border-b border-slate-200 tracking-wider">
+                            <tr class="bg-slate-50 text-[11px] font-bold text-slate-500 uppercase border-b border-slate-200">
                                 <th class="py-3 px-4">No. Kes</th>
                                 <th class="py-3 px-4">Tarikh</th>
                                 <th class="py-3 px-4">Nama Kes</th>
                                 <th class="py-3 px-4">Pelaku (Kelas)</th>
                                 <th class="py-3 px-4">Kategori</th>
                                 <th class="py-3 px-4">Status</th>
-                                <th class="py-3 px-4">Tindakan Ringkas</th>
                                 <th class="py-3 px-4 text-center">Tindakan</th>
                             </tr>
                         </thead>
@@ -252,32 +172,19 @@
         <!-- VIEW: SENARAI KES -->
         <div id="view-senarai" class="hidden space-y-6">
             <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
                     <div>
-                        <h2 class="text-lg font-bold text-slate-900">Pengurusan Rekod Kes Disiplin</h2>
-                        <p class="text-xs text-slate-500">Tapis, cari dan muat turun laporan kes disiplin</p>
-                    </div>
-                    <button onclick="window.openNewCaseModal()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-xs font-semibold flex items-center space-x-2 transition">
-                        <i class="fa-solid fa-plus"></i>
-                        <span>Tambah Kes Baharu</span>
-                    </button>
-                </div>
-
-                <!-- Filters -->
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-3 pt-3 border-t border-slate-100">
-                    <div>
-                        <label class="block text-[11px] font-semibold text-slate-500 mb-1">Kategori Kes</label>
-                        <select id="filterKategori" onchange="window.applyFilters()" class="w-full text-xs p-2 bg-slate-50 border border-slate-300 rounded-lg focus:ring-1 focus:ring-red-500">
+                        <label class="block text-[11px] font-semibold text-slate-500 mb-1">Kategori</label>
+                        <select id="filterKategori" onchange="applyFilters()" class="w-full text-xs p-2 bg-slate-50 border border-slate-300 rounded-lg">
                             <option value="">Semua Kategori</option>
                             <option value="Ringan">Ringan</option>
                             <option value="Sederhana">Sederhana</option>
                             <option value="Berat">Berat</option>
                         </select>
                     </div>
-
                     <div>
-                        <label class="block text-[11px] font-semibold text-slate-500 mb-1">Status Kes</label>
-                        <select id="filterStatus" onchange="window.applyFilters()" class="w-full text-xs p-2 bg-slate-50 border border-slate-300 rounded-lg focus:ring-1 focus:ring-red-500">
+                        <label class="block text-[11px] font-semibold text-slate-500 mb-1">Status</label>
+                        <select id="filterStatus" onchange="applyFilters()" class="w-full text-xs p-2 bg-slate-50 border border-slate-300 rounded-lg">
                             <option value="">Semua Status</option>
                             <option value="Baru Dilaporkan">Baru Dilaporkan</option>
                             <option value="Dalam Siasatan">Dalam Siasatan</option>
@@ -285,10 +192,9 @@
                             <option value="Selesai">Selesai</option>
                         </select>
                     </div>
-
                     <div>
-                        <label class="block text-[11px] font-semibold text-slate-500 mb-1">Tahun / Kelas</label>
-                        <select id="filterTingkatan" onchange="window.applyFilters()" class="w-full text-xs p-2 bg-slate-50 border border-slate-300 rounded-lg focus:ring-1 focus:ring-red-500">
+                        <label class="block text-[11px] font-semibold text-slate-500 mb-1">Tahun / Darjah</label>
+                        <select id="filterTingkatan" onchange="applyFilters()" class="w-full text-xs p-2 bg-slate-50 border border-slate-300 rounded-lg">
                             <option value="">Semua Tahun</option>
                             <option value="Tahun 1">Tahun 1</option>
                             <option value="Tahun 2">Tahun 2</option>
@@ -298,10 +204,9 @@
                             <option value="Tahun 6">Tahun 6</option>
                         </select>
                     </div>
-
                     <div>
-                        <label class="block text-[11px] font-semibold text-slate-500 mb-1">Lokasi Kejadian</label>
-                        <select id="filterLokasi" onchange="window.applyFilters()" class="w-full text-xs p-2 bg-slate-50 border border-slate-300 rounded-lg focus:ring-1 focus:ring-red-500">
+                        <label class="block text-[11px] font-semibold text-slate-500 mb-1">Lokasi</label>
+                        <select id="filterLokasi" onchange="applyFilters()" class="w-full text-xs p-2 bg-slate-50 border border-slate-300 rounded-lg">
                             <option value="">Semua Lokasi</option>
                             <option value="Kelas">Kelas</option>
                             <option value="Kantin">Kantin</option>
@@ -311,9 +216,8 @@
                             <option value="Lain-lain">Lain-lain</option>
                         </select>
                     </div>
-
-                    <div class="col-span-2 md:col-span-1 flex items-end">
-                        <button onclick="window.resetFilters()" class="w-full text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 py-2 px-3 rounded-lg font-medium transition flex items-center justify-center space-x-1">
+                    <div class="flex items-end">
+                        <button onclick="resetFilters()" class="w-full text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 py-2 px-3 rounded-lg font-medium transition flex items-center justify-center space-x-1">
                             <i class="fa-solid fa-rotate-left text-[10px]"></i>
                             <span>Reset Penapis</span>
                         </button>
@@ -321,12 +225,11 @@
                 </div>
             </div>
 
-            <!-- Full Records Table -->
             <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="bg-slate-50 text-[11px] font-bold text-slate-500 uppercase border-b border-slate-200 tracking-wider">
+                            <tr class="bg-slate-50 text-[11px] font-bold text-slate-500 uppercase border-b border-slate-200">
                                 <th class="py-3.5 px-4">No. Kes</th>
                                 <th class="py-3.5 px-4">Tarikh & Masa</th>
                                 <th class="py-3.5 px-4">Nama Kes & Lokasi</th>
@@ -346,7 +249,6 @@
     <!-- MODAL: BORANG LAPORAN KES BAHARU -->
     <div id="modalNewCase" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-3 overflow-y-auto no-print">
         <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full my-8 overflow-hidden border border-slate-100 flex flex-col max-h-[90vh]">
-            
             <div class="bg-navy-900 text-white px-6 py-4 flex items-center justify-between border-b border-slate-800">
                 <div class="flex items-center space-x-3">
                     <div class="p-2 bg-red-600 rounded-lg text-white">
@@ -354,40 +256,38 @@
                     </div>
                     <div>
                         <h3 class="font-bold text-base">Borang Laporan Kes Disiplin Baharu</h3>
-                        <p class="text-xs text-slate-300">SK Seri Gelugor • Data disimpan terus ke Firebase</p>
+                        <p class="text-xs text-slate-300">SK Seri Gelugor • Simpanan Pangkalan Data</p>
                     </div>
                 </div>
-                <button onclick="window.closeNewCaseModal()" class="text-slate-400 hover:text-white text-xl transition">
+                <button type="button" onclick="closeNewCaseModal()" class="text-slate-400 hover:text-white text-xl">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
 
-            <form id="formCase" onsubmit="window.handleFormSubmit(event)" class="p-6 overflow-y-auto space-y-6 flex-grow">
+            <form id="formCase" onsubmit="handleFormSubmit(event)" class="p-6 overflow-y-auto space-y-6 flex-grow">
                 <!-- 1. Maklumat Kes -->
-                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4">
-                    <h4 class="text-xs font-bold text-red-700 uppercase tracking-wider flex items-center gap-2">
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4 text-xs">
+                    <h4 class="font-bold text-red-700 uppercase tracking-wider flex items-center gap-2">
                         <i class="fa-solid fa-circle-info"></i> 1. Maklumat Kes & Kesalahan
                     </h4>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div>
-                            <label class="block font-semibold text-slate-700 mb-1">No. Kes</label>
-                            <input type="text" id="inputNoKes" readonly class="w-full p-2 bg-slate-200 font-mono font-bold text-slate-700 border border-slate-300 rounded-lg">
+                            <label class="block font-semibold mb-1">No. Kes</label>
+                            <input type="text" id="inputNoKes" readonly class="w-full p-2 bg-slate-200 font-mono font-bold rounded-lg border">
                         </div>
                         <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Tarikh Kejadian *</label>
-                            <input type="date" id="inputTarikh" required class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500">
+                            <label class="block font-semibold mb-1">Tarikh Kejadian *</label>
+                            <input type="date" id="inputTarikh" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-red-500">
                         </div>
                         <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Masa Kejadian *</label>
-                            <input type="time" id="inputMasa" required class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500">
+                            <label class="block font-semibold mb-1">Masa Kejadian *</label>
+                            <input type="time" id="inputMasa" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-red-500">
                         </div>
                     </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Lokasi Kejadian *</label>
-                            <select id="inputLokasi" required class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500">
+                            <label class="block font-semibold mb-1">Lokasi Kejadian *</label>
+                            <select id="inputLokasi" class="w-full p-2 border rounded-lg">
                                 <option value="Kelas">Kelas</option>
                                 <option value="Kantin">Kantin</option>
                                 <option value="Tandas">Tandas</option>
@@ -397,8 +297,8 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Nama Kes / Salah Laku *</label>
-                            <select id="inputNamaKes" required class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500">
+                            <label class="block font-semibold mb-1">Nama Kesalahan *</label>
+                            <select id="inputNamaKes" class="w-full p-2 border rounded-lg">
                                 <option value="Kes Pergaduhan">Pergaduhan</option>
                                 <option value="Kes Buli Fizikal">Buli Fizikal</option>
                                 <option value="Kes Buli Lisan/Siber">Buli Lisan/Siber</option>
@@ -409,179 +309,82 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Kategori Kes *</label>
+                            <label class="block font-semibold mb-1">Kategori Kes *</label>
                             <div class="flex items-center space-x-3 pt-2">
-                                <label class="flex items-center space-x-1 cursor-pointer">
-                                    <input type="radio" name="kategoriKes" value="Ringan" class="text-red-600 focus:ring-red-500">
-                                    <span>Ringan</span>
-                                </label>
-                                <label class="flex items-center space-x-1 cursor-pointer">
-                                    <input type="radio" name="kategoriKes" value="Sederhana" checked class="text-red-600 focus:ring-red-500">
-                                    <span>Sederhana</span>
-                                </label>
-                                <label class="flex items-center space-x-1 cursor-pointer">
-                                    <input type="radio" name="kategoriKes" value="Berat" class="text-red-600 focus:ring-red-500">
-                                    <span>Berat</span>
-                                </label>
+                                <label class="flex items-center space-x-1 cursor-pointer"><input type="radio" name="kategoriKes" value="Ringan"> <span>Ringan</span></label>
+                                <label class="flex items-center space-x-1 cursor-pointer"><input type="radio" name="kategoriKes" value="Sederhana" checked> <span>Sederhana</span></label>
+                                <label class="flex items-center space-x-1 cursor-pointer"><input type="radio" name="kategoriKes" value="Berat"> <span>Berat</span></label>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 2. Maklumat Individu Terlibat -->
-                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4">
-                    <h4 class="text-xs font-bold text-red-700 uppercase tracking-wider flex items-center gap-2">
+                <!-- 2. Maklumat Individu -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4 text-xs">
+                    <h4 class="font-bold text-red-700 uppercase tracking-wider flex items-center gap-2">
                         <i class="fa-solid fa-users"></i> 2. Maklumat Individu Terlibat
                     </h4>
-
-                    <!-- Pelapor -->
-                    <div class="border-b border-slate-200 pb-3">
-                        <p class="text-xs font-bold text-slate-800 mb-2">Maklumat Pelapor</p>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                            <div>
-                                <label class="block text-slate-600 mb-1">Nama Pelapor *</label>
-                                <input type="text" id="inputPelaporNama" required placeholder="Cth: Cikgu Ahmad" class="w-full p-2 border border-slate-300 rounded-lg">
-                            </div>
-                            <div>
-                                <label class="block text-slate-600 mb-1">Jawatan *</label>
-                                <select id="inputPelaporJawatan" class="w-full p-2 border border-slate-300 rounded-lg">
-                                    <option value="Guru">Guru</option>
-                                    <option value="Guru Disiplin">Guru Disiplin</option>
-                                    <option value="Guru Kelas">Guru Kelas</option>
-                                    <option value="Murid">Murid</option>
-                                    <option value="Ibu Bapa">Ibu Bapa</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Pelaku -->
-                    <div class="border-b border-slate-200 pb-3">
-                        <div class="flex items-center justify-between mb-2">
-                            <p class="text-xs font-bold text-slate-800">Maklumat Pelaku / Tertuduh</p>
-                            <button type="button" onclick="window.addPelakuInput()" class="bg-red-600 hover:bg-red-700 text-white text-[11px] px-2.5 py-1 rounded-lg flex items-center space-x-1 transition shadow-sm font-medium">
-                                <i class="fa-solid fa-plus text-[10px]"></i>
-                                <span>Tambah Pelaku</span>
-                            </button>
-                        </div>
-                        <div id="pelakuContainer" class="space-y-3"></div>
-                    </div>
-
-                    <!-- Mangsa -->
-                    <div>
-                        <div class="flex items-center justify-between mb-2">
-                            <p class="text-xs font-bold text-slate-800">Maklumat Mangsa (Jika Ada)</p>
-                            <button type="button" onclick="window.addMangsaInput()" class="bg-slate-800 hover:bg-slate-900 text-white text-[11px] px-2.5 py-1 rounded-lg flex items-center space-x-1 transition shadow-sm font-medium">
-                                <i class="fa-solid fa-plus text-[10px]"></i>
-                                <span>Tambah Mangsa</span>
-                            </button>
-                        </div>
-                        <div id="mangsaContainer" class="space-y-3"></div>
-                    </div>
-                </div>
-
-                <!-- 3. Siasatan -->
-                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4">
-                    <h4 class="text-xs font-bold text-red-700 uppercase tracking-wider flex items-center gap-2">
-                        <i class="fa-solid fa-magnifying-glass"></i> 3. Modul Siasatan Kes
-                    </h4>
-
-                    <div class="text-xs space-y-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-3 border-b border-slate-200">
                         <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Kenyataan Siasatan & Kronologi *</label>
-                            <textarea id="inputKenyataanSiasatan" rows="3" required placeholder="Kronologi kejadian berdasarkan saksi dan temu bual..." class="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500"></textarea>
+                            <label class="block font-semibold mb-1">Nama Pelapor *</label>
+                            <input type="text" id="inputPelaporNama" required placeholder="Cth: Cikgu Ahmad" class="w-full p-2 border rounded-lg">
                         </div>
-
                         <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <label class="font-semibold text-slate-700">Senarai Saksi Kejadian</label>
-                                <button type="button" onclick="window.addSaksiInput()" class="bg-slate-800 hover:bg-slate-900 text-white text-[11px] px-2.5 py-1 rounded-lg flex items-center space-x-1 transition shadow-sm">
-                                    <i class="fa-solid fa-plus text-[10px]"></i>
-                                    <span>Tambah Saksi</span>
-                                </button>
-                            </div>
-                            <div id="saksiContainer" class="space-y-2"></div>
-                        </div>
-
-                        <div class="w-full sm:w-1/3 pt-1">
-                            <label class="block text-slate-600 mb-1">Tarikh Siasatan</label>
-                            <input type="date" id="inputTarikhSiasatan" class="w-full p-2 border border-slate-300 rounded-lg">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 4. Bahan Bukti -->
-                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
-                    <h4 class="text-xs font-bold text-red-700 uppercase tracking-wider flex items-center gap-2">
-                        <i class="fa-solid fa-paperclip"></i> 4. Bahan Bukti / Gambar
-                    </h4>
-
-                    <div class="flex items-center justify-center w-full">
-                        <label class="flex flex-col items-center justify-center w-full h-28 border-2 border-slate-300 border-dashed rounded-xl cursor-pointer bg-white hover:bg-slate-100 transition">
-                            <div class="flex flex-col items-center justify-center pt-2 pb-3">
-                                <i class="fa-solid fa-cloud-arrow-up text-2xl text-red-500 mb-1"></i>
-                                <p class="text-xs text-slate-600"><span class="font-semibold">Klik untuk muat naik bahan bukti</span></p>
-                                <p class="text-[10px] text-slate-400">Format: JPG, PNG, PDF</p>
-                            </div>
-                            <input type="file" id="fileEvidenceInput" multiple accept="image/*,.pdf" onchange="window.handleFileUpload(event)" class="hidden" />
-                        </label>
-                    </div>
-
-                    <div id="evidencePreviewList" class="flex flex-wrap gap-3 pt-2"></div>
-                </div>
-
-                <!-- 5. Tindakan & Status -->
-                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4">
-                    <h4 class="text-xs font-bold text-red-700 uppercase tracking-wider flex items-center gap-2">
-                        <i class="fa-solid fa-gavel"></i> 5. Tindakan Yang Diambil & Status
-                    </h4>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                        <div class="bg-white p-3 rounded-lg border border-slate-200">
-                            <p class="font-bold text-slate-800 mb-2 border-b pb-1">Tindakan Murid</p>
-                            <div class="grid grid-cols-2 gap-1.5" id="checkboxesTindakanMurid">
-                                <label class="flex items-center space-x-1.5"><input type="checkbox" value="Nasihat" class="rounded text-red-600"> <span>Nasihat</span></label>
-                                <label class="flex items-center space-x-1.5"><input type="checkbox" value="Amaran lisan" class="rounded text-red-600"> <span>Amaran lisan</span></label>
-                                <label class="flex items-center space-x-1.5"><input type="checkbox" value="Surat amaran" class="rounded text-red-600"> <span>Surat amaran</span></label>
-                                <label class="flex items-center space-x-1.5"><input type="checkbox" value="Kaunseling" class="rounded text-red-600"> <span>Kaunseling</span></label>
-                                <label class="flex items-center space-x-1.5"><input type="checkbox" value="Perjumpaan ibu bapa" class="rounded text-red-600"> <span>Perjumpaan ibu bapa</span></label>
-                                <label class="flex items-center space-x-1.5"><input type="checkbox" value="Gantung persekolahan" class="rounded text-red-600"> <span>Gantung sekolah</span></label>
-                                <label class="flex items-center space-x-1.5 col-span-2"><input type="checkbox" value="Rujukan PPD/JPN" class="rounded text-red-600"> <span>Rujukan PPD/JPN</span></label>
-                            </div>
-                        </div>
-
-                        <div class="bg-white p-3 rounded-lg border border-slate-200">
-                            <p class="font-bold text-slate-800 mb-2 border-b pb-1">Tindakan Pemulihan / Sahsiah</p>
-                            <div class="grid grid-cols-2 gap-1.5" id="checkboxesTindakanPemulihan">
-                                <label class="flex items-center space-x-1.5"><input type="checkbox" value="Program sahsiah" class="rounded text-red-600"> <span>Program sahsiah</span></label>
-                                <label class="flex items-center space-x-1.5"><input type="checkbox" value="Aku janji" class="rounded text-red-600"> <span>Aku janji</span></label>
-                                <label class="flex items-center space-x-1.5"><input type="checkbox" value="Khidmat sekolah" class="rounded text-red-600"> <span>Khidmat sekolah</span></label>
-                                <label class="flex items-center space-x-1.5"><input type="checkbox" value="Pemantauan berkala" class="rounded text-red-600"> <span>Pemantauan berkala</span></label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="text-xs space-y-3">
-                        <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Catatan Tindakan</label>
-                            <textarea id="inputCatatanTindakan" rows="2" placeholder="Catatan lanjut tindakan disiplin..." class="w-full p-2 border border-slate-300 rounded-lg"></textarea>
-                        </div>
-
-                        <div class="w-full sm:w-1/2">
-                            <label class="block font-semibold text-slate-700 mb-1">Status Kes *</label>
-                            <select id="inputStatusKes" required class="w-full p-2 border border-slate-300 rounded-lg font-semibold text-xs">
-                                <option value="Baru Dilaporkan">Baru Dilaporkan</option>
-                                <option value="Dalam Siasatan">Dalam Siasatan</option>
-                                <option value="Menunggu Tindakan">Menunggu Tindakan</option>
-                                <option value="Selesai">Selesai</option>
+                            <label class="block font-semibold mb-1">Jawatan *</label>
+                            <select id="inputPelaporJawatan" class="w-full p-2 border rounded-lg">
+                                <option value="Guru">Guru</option>
+                                <option value="Guru Disiplin">Guru Disiplin</option>
+                                <option value="Guru Kelas">Guru Kelas</option>
+                                <option value="Murid">Murid</option>
+                                <option value="Ibu Bapa">Ibu Bapa</option>
                             </select>
                         </div>
                     </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-bold">Maklumat Pelaku / Tertuduh</span>
+                            <button type="button" onclick="addPelakuInput()" class="bg-red-600 hover:bg-red-700 text-white px-2.5 py-1 rounded text-[11px] font-medium">+ Tambah Pelaku</button>
+                        </div>
+                        <div id="pelakuContainer" class="space-y-2"></div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-bold">Maklumat Mangsa (Jika Ada)</span>
+                            <button type="button" onclick="addMangsaInput()" class="bg-slate-800 hover:bg-slate-900 text-white px-2.5 py-1 rounded text-[11px] font-medium">+ Tambah Mangsa</button>
+                        </div>
+                        <div id="mangsaContainer" class="space-y-2"></div>
+                    </div>
                 </div>
 
-                <div class="flex items-center justify-end space-x-3 pt-4 border-t border-slate-200">
-                    <button type="button" onclick="window.closeNewCaseModal()" class="px-5 py-2 rounded-lg border border-slate-300 text-slate-600 font-medium text-xs hover:bg-slate-100 transition">Batal</button>
-                    <button type="submit" id="btnSubmitForm" class="px-6 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold text-xs shadow-md transition">Simpan Rekod Kes (Cloud)</button>
+                <!-- 3. Siasatan & Tindakan -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3 text-xs">
+                    <h4 class="font-bold text-red-700 uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-magnifying-glass"></i> 3. Siasatan & Tindakan
+                    </h4>
+                    <div>
+                        <label class="block font-semibold mb-1">Kenyataan Siasatan *</label>
+                        <textarea id="inputKenyataanSiasatan" rows="3" required placeholder="Kronologi kejadian berdasarkan temu bual saksi..." class="w-full p-2.5 border rounded-lg"></textarea>
+                    </div>
+                    <div>
+                        <label class="block font-semibold mb-1">Catatan Tindakan Disiplin</label>
+                        <textarea id="inputCatatanTindakan" rows="2" placeholder="Catatan kaunseling / surat amaran..." class="w-full p-2 border rounded-lg"></textarea>
+                    </div>
+                    <div class="w-full sm:w-1/2">
+                        <label class="block font-semibold mb-1">Status Kes *</label>
+                        <select id="inputStatusKes" required class="w-full p-2 border rounded-lg font-semibold">
+                            <option value="Baru Dilaporkan">Baru Dilaporkan</option>
+                            <option value="Dalam Siasatan">Dalam Siasatan</option>
+                            <option value="Menunggu Tindakan">Menunggu Tindakan</option>
+                            <option value="Selesai">Selesai</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end space-x-3 pt-4 border-t">
+                    <button type="button" onclick="closeNewCaseModal()" class="px-5 py-2 rounded-lg border text-slate-600 text-xs hover:bg-slate-100">Batal</button>
+                    <button type="submit" id="btnSubmitForm" class="px-6 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold text-xs shadow">Simpan Rekod Kes</button>
                 </div>
             </form>
         </div>
@@ -589,148 +392,60 @@
 
     <!-- MODAL: DETAIL VIEW -->
     <div id="modalDetailView" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-3 overflow-y-auto no-print">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full my-8 overflow-hidden border border-slate-100 flex flex-col max-h-[90vh]">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full my-8 overflow-hidden border flex flex-col max-h-[90vh]">
             <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <span id="detailBadgeStatus" class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">Dalam Siasatan</span>
-                    <h3 class="font-bold text-base" id="detailModalTitle">Laporan Kes</h3>
-                </div>
+                <h3 class="font-bold text-base" id="detailModalTitle">Laporan Kes</h3>
                 <div class="flex items-center space-x-2">
-                    <button onclick="window.generatePDF(window.currentViewingCaseId)" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded-lg flex items-center space-x-1 transition shadow font-medium">
-                        <i class="fa-solid fa-file-pdf"></i>
-                        <span>Jana PDF</span>
-                    </button>
-                    <button onclick="window.triggerPrintCurrentCase()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded-lg flex items-center space-x-1 transition shadow font-medium">
-                        <i class="fa-solid fa-print"></i>
-                        <span>Cetak</span>
-                    </button>
-                    <button onclick="window.closeDetailModal()" class="text-slate-400 hover:text-white text-xl ml-2">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
+                    <button onclick="generatePDF(currentViewingCaseId)" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded-lg"><i class="fa-solid fa-file-pdf mr-1"></i>Jana PDF</button>
+                    <button onclick="closeDetailModal()" class="text-slate-400 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
                 </div>
             </div>
-
             <div class="p-6 overflow-y-auto space-y-6 text-xs text-slate-700 flex-grow" id="detailModalBody"></div>
         </div>
     </div>
 
-    <!-- PRINTABLE TEMPLATE -->
+    <!-- PRINTABLE AREA (FOR PDF) -->
     <div id="printableReportArea" class="hidden">
-        <div class="max-w-3xl mx-auto border-2 border-slate-800 p-8 space-y-6 text-slate-900 font-sans text-xs bg-white" id="pdfReportContent">
-            <div class="text-center border-b-2 border-slate-900 pb-4 flex items-center justify-between">
-                <div class="w-16 h-16 flex items-center justify-center border border-slate-400 rounded-lg">
-                    <i class="fa-solid fa-school text-3xl text-slate-800"></i>
-                </div>
-                <div class="text-center px-4">
-                    <h1 class="text-base font-extrabold tracking-wide uppercase">SEKOLAH KEBANGSAAN SERI GELUGOR</h1>
-                    <p class="text-[11px] font-medium">Gelugor, Terengganu Darul Iman</p>
-                    <p class="text-[10px] text-slate-600">Tel: 09-6654321 | E-mel: skserigelugor@edu.my</p>
-                    <h2 class="text-sm font-bold underline mt-2 uppercase tracking-wider">LAPORAN RASMI SIASATAN DISIPLIN MURID</h2>
-                </div>
-                <div class="text-right text-[10px] text-slate-600">
-                    <p><strong>Rujukan:</strong> <span id="printNoKes">-</span></p>
-                    <p><strong>Tarikh Cetak:</strong> <span id="printTodayDate">-</span></p>
-                </div>
+        <div class="max-w-3xl mx-auto border-2 border-slate-800 p-8 space-y-6 text-slate-900 text-xs bg-white">
+            <div class="text-center border-b-2 border-slate-900 pb-4">
+                <h1 class="text-base font-extrabold uppercase">SEKOLAH KEBANGSAAN SERI GELUGOR</h1>
+                <p class="text-[11px]">LAPORAN RASMI SIASATAN DISIPLIN MURID</p>
+                <p class="text-[10px] text-slate-500 mt-1">No. Kes: <span id="printNoKes">-</span> | Tarikh Cetak: <span id="printTodayDate">-</span></p>
             </div>
-
-            <div class="space-y-2">
-                <h3 class="font-bold bg-slate-100 p-1.5 border-l-4 border-slate-800 uppercase text-[11px]">A. MAKLUMAT KES & KEJADIAN</h3>
-                <table class="w-full border-collapse border border-slate-300">
-                    <tr>
-                        <td class="border border-slate-300 p-1.5 font-bold bg-slate-50 w-1/4">No. Kes</td>
-                        <td class="border border-slate-300 p-1.5 font-mono" id="printValNoKes">-</td>
-                        <td class="border border-slate-300 p-1.5 font-bold bg-slate-50 w-1/4">Tarikh & Masa</td>
-                        <td class="border border-slate-300 p-1.5" id="printValTarikhMasa">-</td>
-                    </tr>
-                    <tr>
-                        <td class="border border-slate-300 p-1.5 font-bold bg-slate-50">Nama Kesalahan</td>
-                        <td class="border border-slate-300 p-1.5" id="printValNamaKes">-</td>
-                        <td class="border border-slate-300 p-1.5 font-bold bg-slate-50">Kategori & Lokasi</td>
-                        <td class="border border-slate-300 p-1.5" id="printValKategoriLokasi">-</td>
-                    </tr>
-                    <tr>
-                        <td class="border border-slate-300 p-1.5 font-bold bg-slate-50">Status Kes</td>
-                        <td class="border border-slate-300 p-1.5 font-semibold" colspan="3" id="printValStatus">-</td>
-                    </tr>
-                </table>
+            <table class="w-full border-collapse border border-slate-300">
+                <tr>
+                    <td class="border p-1.5 font-bold bg-slate-50">Nama Kesalahan</td>
+                    <td class="border p-1.5" id="printValNamaKes">-</td>
+                    <td class="border p-1.5 font-bold bg-slate-50">Kategori & Lokasi</td>
+                    <td class="border p-1.5" id="printValKategoriLokasi">-</td>
+                </tr>
+                <tr>
+                    <td class="border p-1.5 font-bold bg-slate-50">Pelaku</td>
+                    <td class="border p-1.5 font-semibold" id="printValPelaku">-</td>
+                    <td class="border p-1.5 font-bold bg-slate-50">Status</td>
+                    <td class="border p-1.5" id="printValStatus">-</td>
+                </tr>
+            </table>
+            <div>
+                <p class="font-bold border-b pb-1 mb-1">Kenyataan Siasatan:</p>
+                <div class="border p-2 bg-slate-50" id="printValSiasatan">-</div>
             </div>
-
-            <div class="space-y-2">
-                <h3 class="font-bold bg-slate-100 p-1.5 border-l-4 border-slate-800 uppercase text-[11px]">B. MAKLUMAT INDIVIDU TERLIBAT</h3>
-                <table class="w-full border-collapse border border-slate-300 text-left">
-                    <thead>
-                        <tr class="bg-slate-50 font-bold text-[10px]">
-                            <th class="border border-slate-300 p-1.5">Peranan</th>
-                            <th class="border border-slate-300 p-1.5">Nama Penuh</th>
-                            <th class="border border-slate-300 p-1.5">Kelas / Jawatan</th>
-                            <th class="border border-slate-300 p-1.5">Catatan Tambahan</th>
-                        </tr>
-                    </thead>
-                    <tbody id="printTbodyIndividu"></tbody>
-                </table>
-            </div>
-
-            <div class="space-y-2">
-                <h3 class="font-bold bg-slate-100 p-1.5 border-l-4 border-slate-800 uppercase text-[11px]">C. KRONOLOGI KEJADIAN & HASIL SIASATAN</h3>
-                <div class="border border-slate-300 p-3 min-h-[60px] bg-white leading-relaxed text-slate-800" id="printValSiasatan"></div>
-                <p class="text-[10px] text-slate-600"><strong>Senarai Saksi Terlibat:</strong> <span id="printValSaksi">-</span></p>
-            </div>
-
-            <div class="space-y-2">
-                <h3 class="font-bold bg-slate-100 p-1.5 border-l-4 border-slate-800 uppercase text-[11px]">D. SENARAI BAHAN BUKTI</h3>
-                <div class="border border-slate-300 p-3 text-[10px] space-y-2" id="printValBukti"></div>
-            </div>
-
-            <div class="space-y-2">
-                <h3 class="font-bold bg-slate-100 p-1.5 border-l-4 border-slate-800 uppercase text-[11px]">E. TINDAKAN DISIPLIN & PEMULIHAN</h3>
-                <div class="border border-slate-300 p-3 space-y-1">
-                    <p><strong>Tindakan Dikenakan:</strong> <span id="printValTindakanDikenakan">-</span></p>
-                    <p><strong>Catatan Tindakan:</strong> <span id="printValCatatanTindakan">-</span></p>
-                </div>
-            </div>
-
-            <div class="pt-8 grid grid-cols-2 gap-8 text-center">
-                <div class="space-y-12">
-                    <p class="font-bold text-[10px]">Disediakan Oleh (Guru Disiplin / Pelapor):</p>
-                    <div>
-                        <div class="border-b border-slate-800 w-48 mx-auto"></div>
-                        <p class="font-bold mt-1" id="printSignPelapor">( Guru Disiplin SK Seri Gelugor )</p>
-                        <p class="text-[10px] text-slate-500">Guru Disiplin & Sahsiah Murid</p>
-                    </div>
-                </div>
-                <div class="space-y-12">
-                    <p class="font-bold text-[10px]">Disahkan Oleh (Guru Besar / PK HEM):</p>
-                    <div>
-                        <div class="border-b border-slate-800 w-48 mx-auto"></div>
-                        <p class="font-bold mt-1">( Guru Besar SK Seri Gelugor )</p>
-                        <p class="text-[10px] text-slate-500">Guru Besar / Penolong Kanan HEM</p>
-                    </div>
-                </div>
+            <div>
+                <p class="font-bold border-b pb-1 mb-1">Tindakan Disiplin:</p>
+                <div class="border p-2 bg-slate-50" id="printValCatatanTindakan">-</div>
             </div>
         </div>
     </div>
 
     <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white text-xs px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-2 transform translate-y-20 opacity-0 transition-all duration-300 z-50 no-print">
-        <i class="fa-solid fa-circle-check text-emerald-400 text-base" id="toastIcon"></i>
-        <span id="toastMsg">Kemaskini berjaya.</span>
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white text-xs px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-2 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+        <span id="toastMsg">Berjaya</span>
     </div>
 
-    <!-- FIREBASE MODULE JS -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { 
-            getFirestore, 
-            collection, 
-            addDoc, 
-            doc, 
-            updateDoc, 
-            onSnapshot, 
-            query, 
-            orderBy 
-        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-        // Konfigurasi Firebase Rasmi SK Seri Gelugor[cite: 1]
+    <!-- CORE JAVASCRIPT & FIREBASE INTEGRATION -->
+    <script>
+        // Kunci Firebase Anda[cite: 1]
         const firebaseConfig = {
             apiKey: "AIzaSyDZZE-kX7LnqYfxjy38-GU7Cl5SjTj_ua8",[cite: 1]
             authDomain: "e-disiplin-2610d.firebaseapp.com",[cite: 1]
@@ -740,806 +455,410 @@
             appId: "1:35996803320:web:f186ec31b3e84a02d71b0d"[cite: 1]
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const casesCollection = collection(db, "disiplin_cases");
-
+        let db = null;
         let casesData = [];
-        let activeUploadedFiles = [];
+        let currentViewingCaseId = null;
         let categoryChartInstance = null;
         let misconductChartInstance = null;
-        window.currentViewingCaseId = null;
-
-        let saksiCount = 0;
         let pelakuCount = 0;
         let mangsaCount = 0;
 
-        // Mendengar perubahan rekod secara terus dari Firestore (Real-Time)
-        const q = query(casesCollection, orderBy("tarikh", "desc"));
-        onSnapshot(q, (snapshot) => {
-            casesData = [];
-            snapshot.forEach((docSnap) => {
-                casesData.push({ firestoreId: docSnap.id, ...docSnap.data() });
-            });
-            updateDashboardMetrics();
-            renderRecentTable();
-            renderAllCasesTable();
-            renderCharts();
-        }, (error) => {
-            console.error("Ralat sambungan Firestore:", error);
-            showToast("Gagal menyambung ke Firestore. Semak Security Rules anda.");
-        });
+        // Inisialisasi Firebase Compat
+        try {
+            if (typeof firebase !== 'undefined') {
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.firestore();
+                
+                // Dengar data secara langsung (Real-Time listener)
+                db.collection("disiplin_cases").orderBy("tarikh", "desc")
+                    .onSnapshot((snapshot) => {
+                        casesData = [];
+                        snapshot.forEach((doc) => {
+                            casesData.push({ firestoreId: doc.id, ...doc.data() });
+                        });
+                        document.getElementById('cloudStatus').innerHTML = '<i class="fa-solid fa-circle text-[8px] animate-pulse mr-1 text-emerald-400"></i>Online';
+                        document.getElementById('cloudStatus').className = 'bg-emerald-500/20 text-emerald-300 text-xs px-2 py-0.5 rounded-full border border-emerald-500/30 font-semibold';
+                        updateDashboardMetrics();
+                        renderRecentTable();
+                        renderAllCasesTable();
+                        renderCharts();
+                    }, (error) => {
+                        console.error("Firestore Listen Error:", error);
+                        document.getElementById('cloudStatus').innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-1 text-amber-400"></i>Semak Rules';
+                        showToast("Peringatan: Sila pastikan Firestore Rules telah dibuka.");
+                    });
+            }
+        } catch (e) {
+            console.error("Firebase init failed:", e);
+        }
 
-        // Simpan Kes Baru ke Firestore
-        window.handleFormSubmit = async function(e) {
+        // ==================== FUNGSI MODAL & UI (DIJAMIN BERFUNGSI) ====================
+
+        function openNewCaseModal() {
+            const year = new Date().getFullYear();
+            const count = casesData.length + 1;
+            document.getElementById('inputNoKes').value = `DS${year}-${String(count).padStart(3, '0')}`;
+            document.getElementById('inputTarikh').value = new Date().toISOString().split('T')[0];
+            document.getElementById('inputMasa').value = new Date().toTimeString().slice(0, 5);
+
+            document.getElementById('pelakuContainer').innerHTML = '';
+            document.getElementById('mangsaContainer').innerHTML = '';
+            pelakuCount = 0;
+            mangsaCount = 0;
+
+            addPelakuInput();
+            document.getElementById('modalNewCase').classList.remove('hidden');
+        }
+
+        function closeNewCaseModal() {
+            document.getElementById('modalNewCase').classList.add('hidden');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('modalDetailView').classList.add('hidden');
+            currentViewingCaseId = null;
+        }
+
+        function switchTab(tabName) {
+            const vDash = document.getElementById('view-dashboard');
+            const vList = document.getElementById('view-senarai');
+            const bDash = document.getElementById('tabBtn-dashboard');
+            const bList = document.getElementById('tabBtn-senarai');
+
+            if (tabName === 'dashboard') {
+                vDash.classList.remove('hidden'); vList.classList.add('hidden');
+                bDash.className = "px-4 py-2 rounded-lg text-slate-900 bg-white shadow-sm font-semibold";
+                bList.className = "px-4 py-2 rounded-lg text-slate-600 hover:text-slate-900";
+            } else {
+                vDash.classList.add('hidden'); vList.classList.remove('hidden');
+                bList.className = "px-4 py-2 rounded-lg text-slate-900 bg-white shadow-sm font-semibold";
+                bDash.className = "px-4 py-2 rounded-lg text-slate-600 hover:text-slate-900";
+            }
+        }
+
+        function addPelakuInput(nama = '', kelas = '') {
+            pelakuCount++;
+            const container = document.getElementById('pelakuContainer');
+            const div = document.createElement('div');
+            div.id = `pelakuRow_${pelakuCount}`;
+            div.className = "grid grid-cols-12 gap-2 bg-white p-2 rounded-lg border border-slate-200";
+            div.innerHTML = `
+                <div class="col-span-7">
+                    <input type="text" class="pelakuNamaInput w-full p-1.5 border rounded text-xs" placeholder="Nama Murid *" value="${nama}" required>
+                </div>
+                <div class="col-span-4">
+                    <input type="text" class="pelakuKelasInput w-full p-1.5 border rounded text-xs" placeholder="Kelas (Cth: 4 Pintar) *" value="${kelas}" required>
+                </div>
+                <div class="col-span-1 flex items-center justify-center">
+                    <button type="button" onclick="this.parentElement.parentElement.remove()" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash-can"></i></button>
+                </div>
+            `;
+            container.appendChild(div);
+        }
+
+        function addMangsaInput(nama = '', kelas = '') {
+            mangsaCount++;
+            const container = document.getElementById('mangsaContainer');
+            const div = document.createElement('div');
+            div.id = `mangsaRow_${mangsaCount}`;
+            div.className = "grid grid-cols-12 gap-2 bg-white p-2 rounded-lg border border-slate-200";
+            div.innerHTML = `
+                <div class="col-span-7">
+                    <input type="text" class="mangsaNamaInput w-full p-1.5 border rounded text-xs" placeholder="Nama Mangsa" value="${nama}">
+                </div>
+                <div class="col-span-4">
+                    <input type="text" class="mangsaKelasInput w-full p-1.5 border rounded text-xs" placeholder="Kelas" value="${kelas}">
+                </div>
+                <div class="col-span-1 flex items-center justify-center">
+                    <button type="button" onclick="this.parentElement.parentElement.remove()" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash-can"></i></button>
+                </div>
+            `;
+            container.appendChild(div);
+        }
+
+        function handleFormSubmit(e) {
             e.preventDefault();
             const btn = document.getElementById('btnSubmitForm');
             btn.disabled = true;
-            btn.innerText = "Menyimpan ke Cloud...";
+            btn.innerText = "Menyimpan...";
 
-            const pelakuList = getPelakuListFromForm();
-            if(pelakuList.length === 0) {
-                showToast("Sila isi sekurang-kurangnya seorang pelaku!");
-                btn.disabled = false;
-                btn.innerText = "Simpan Rekod Kes (Cloud)";
-                return;
-            }
+            const pelakus = [];
+            document.querySelectorAll('#pelakuContainer > div').forEach(r => {
+                const n = r.querySelector('.pelakuNamaInput')?.value.trim();
+                const k = r.querySelector('.pelakuKelasInput')?.value.trim();
+                if (n) pelakus.push({ nama: n, kelas: k || '-' });
+            });
 
-            const mangsaList = getMangsaListFromForm();
-            const muridChecks = Array.from(document.querySelectorAll('#checkboxesTindakanMurid input[type="checkbox"]:checked')).map(cb => cb.value);
-            const pemulihanChecks = Array.from(document.querySelectorAll('#checkboxesTindakanPemulihan input[type="checkbox"]:checked')).map(cb => cb.value);
-            const selectedKategori = document.querySelector('input[name="kategoriKes"]:checked').value;
-            const saksiList = getSaksiListFromForm();
-
-            const newCaseObj = {
+            const newCase = {
                 id: document.getElementById('inputNoKes').value,
                 tarikh: document.getElementById('inputTarikh').value,
                 masa: document.getElementById('inputMasa').value,
                 namaKes: document.getElementById('inputNamaKes').value,
-                kategori: selectedKategori,
+                kategori: document.querySelector('input[name="kategoriKes"]:checked').value,
                 lokasi: document.getElementById('inputLokasi').value,
                 status: document.getElementById('inputStatusKes').value,
                 pelapor: {
                     nama: document.getElementById('inputPelaporNama').value,
                     jawatan: document.getElementById('inputPelaporJawatan').value
                 },
-                pelaku: pelakuList,
-                mangsa: mangsaList,
+                pelaku: pelakus,
                 siasatan: document.getElementById('inputKenyataanSiasatan').value,
-                saksi: saksiList.length > 0 ? saksiList : ["-"],
-                tarikhSiasatan: document.getElementById('inputTarikhSiasatan').value,
-                bukti: [...activeUploadedFiles],
-                tindakanMurid: muridChecks,
-                tindakanPemulihan: pemulihanChecks,
                 catatanTindakan: document.getElementById('inputCatatanTindakan').value,
                 createdAt: new Date().toISOString()
             };
 
-            try {
-                await addDoc(casesCollection, newCaseObj);
-                showToast("Laporan kes berjaya disimpan ke Firestore Cloud!");
-                window.closeNewCaseModal();
-                document.getElementById('formCase').reset();
-            } catch (err) {
-                console.error(err);
-                showToast("Ralat menyimpan data ke Firebase.");
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "Simpan Rekod Kes (Cloud)";
-            }
-        };
-
-        // Kemaskini Status di Firestore
-        window.updateQuickStatus = async function(firestoreId) {
-            const newStatus = document.getElementById('quickStatusSelect').value;
-            try {
-                const caseRef = doc(db, "disiplin_cases", firestoreId);
-                await updateDoc(caseRef, { status: newStatus });
-                showToast(`Status kes telah dikemaskini kepada: ${newStatus}`);
-                window.closeDetailModal();
-            } catch (err) {
-                console.error(err);
-                showToast("Ralat mengemaskini status di cloud.");
-            }
-        };
-
-        window.switchTab = function(tabName) {
-            const viewDashboard = document.getElementById('view-dashboard');
-            const viewSenarai = document.getElementById('view-senarai');
-            const btnDashboard = document.getElementById('tabBtn-dashboard');
-            const btnSenarai = document.getElementById('tabBtn-senarai');
-
-            if (tabName === 'dashboard') {
-                viewDashboard.classList.remove('hidden');
-                viewSenarai.classList.add('hidden');
-                btnDashboard.className = "px-4 py-2 rounded-lg transition text-slate-900 bg-white shadow-sm font-semibold";
-                btnSenarai.className = "px-4 py-2 rounded-lg transition text-slate-600 hover:text-slate-900";
+            if (db) {
+                db.collection("disiplin_cases").add(newCase)
+                    .then(() => {
+                        showToast("Rekod kes berjaya disimpan ke Cloud!");
+                        closeNewCaseModal();
+                        document.getElementById('formCase').reset();
+                    })
+                    .catch((err) => {
+                        console.error(err);
+                        showToast("Ralat menyimpan ke Firestore. Semak Security Rules.");
+                    })
+                    .finally(() => {
+                        btn.disabled = false;
+                        btn.innerText = "Simpan Rekod Kes";
+                    });
             } else {
-                viewDashboard.classList.add('hidden');
-                viewSenarai.classList.remove('hidden');
-                btnSenarai.className = "px-4 py-2 rounded-lg transition text-slate-900 bg-white shadow-sm font-semibold";
-                btnDashboard.className = "px-4 py-2 rounded-lg transition text-slate-600 hover:text-slate-900";
+                casesData.unshift(newCase);
+                updateDashboardMetrics();
+                renderRecentTable();
+                renderAllCasesTable();
+                closeNewCaseModal();
+                showToast("Disimpan secara lokal.");
+                btn.disabled = false;
+                btn.innerText = "Simpan Rekod Kes";
             }
-        };
+        }
+
+        function updateQuickStatus(firestoreId) {
+            const newStatus = document.getElementById('quickStatusSelect').value;
+            if (db && firestoreId) {
+                db.collection("disiplin_cases").doc(firestoreId).update({ status: newStatus })
+                    .then(() => {
+                        showToast(`Status dikemaskini kepada: ${newStatus}`);
+                        closeDetailModal();
+                    })
+                    .catch(e => showToast("Gagal kemaskini di cloud."));
+            }
+        }
 
         function updateDashboardMetrics() {
-            const total = casesData.length;
-            const baru = casesData.filter(c => c.status === 'Baru Dilaporkan').length;
-            const siasatan = casesData.filter(c => c.status === 'Dalam Siasatan').length;
-            const selesai = casesData.filter(c => c.status === 'Selesai').length;
-            const berat = casesData.filter(c => c.kategori === 'Berat').length;
-
-            document.getElementById('kpi-total').innerText = total;
-            document.getElementById('kpi-baru').innerText = baru;
-            document.getElementById('kpi-siasatan').innerText = siasatan;
-            document.getElementById('kpi-selesai').innerText = selesai;
-            document.getElementById('kpi-berat').innerText = berat;
-
-            const countBadge = document.getElementById('totalCasesCountBadge');
-            if (countBadge) countBadge.innerText = total;
-        }
-
-        window.openNewCaseModal = function() {
-            const year = new Date().getFullYear();
-            const count = casesData.length + 1;
-            document.getElementById('inputNoKes').value = `DS${year}-${String(count).padStart(3, '0')}`;
-            
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('inputTarikh').value = today;
-            document.getElementById('inputTarikhSiasatan').value = today;
-
-            activeUploadedFiles = [];
-            renderUploadedEvidenceList();
-            resetSaksiContainer();
-            window.addSaksiInput();
-            resetPelakuContainer();
-            window.addPelakuInput();
-            resetMangsaContainer();
-            window.addMangsaInput();
-
-            document.getElementById('modalNewCase').classList.remove('hidden');
-        };
-
-        window.closeNewCaseModal = function() {
-            document.getElementById('modalNewCase').classList.add('hidden');
-        };
-
-        window.closeDetailModal = function() {
-            document.getElementById('modalDetailView').classList.add('hidden');
-            window.currentViewingCaseId = null;
-        };
-
-        window.triggerPrintCurrentCase = function() {
-            if (window.currentViewingCaseId) {
-                window.printSpecificCase(window.currentViewingCaseId);
-            }
-        };
-
-        function getCategoryBadge(kategori) {
-            switch (kategori) {
-                case 'Ringan': return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">Ringan</span>`;
-                case 'Sederhana': return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-orange-100 text-orange-800 border border-orange-200">Sederhana</span>`;
-                case 'Berat': return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-800 border border-purple-200">Berat</span>`;
-                default: return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">${kategori || '-'}</span>`;
-            }
-        }
-
-        function getStatusBadge(status) {
-            switch (status) {
-                case 'Baru Dilaporkan': return `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700 border border-red-200">Baru Dilaporkan</span>`;
-                case 'Dalam Siasatan': return `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">Dalam Siasatan</span>`;
-                case 'Menunggu Tindakan': return `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200">Menunggu Tindakan</span>`;
-                case 'Selesai': return `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">Selesai</span>`;
-                default: return `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700">${status || '-'}</span>`;
-            }
+            document.getElementById('kpi-total').innerText = casesData.length;
+            document.getElementById('kpi-baru').innerText = casesData.filter(c => c.status === 'Baru Dilaporkan').length;
+            document.getElementById('kpi-siasatan').innerText = casesData.filter(c => c.status === 'Dalam Siasatan').length;
+            document.getElementById('kpi-selesai').innerText = casesData.filter(c => c.status === 'Selesai').length;
+            document.getElementById('kpi-berat').innerText = casesData.filter(c => c.kategori === 'Berat').length;
+            document.getElementById('totalCasesCountBadge').innerText = casesData.length;
         }
 
         function getPelakuDisplay(pelakuData) {
             if (!pelakuData) return '-';
             const arr = Array.isArray(pelakuData) ? pelakuData : [pelakuData];
-            if (arr.length === 0) return '-';
             return arr.map(p => `${p.nama} <span class="text-slate-400">(${p.kelas || '-'})</span>`).join(', ');
         }
 
-        function resetSaksiContainer() {
-            const container = document.getElementById('saksiContainer');
-            if (container) container.innerHTML = '';
-            saksiCount = 0;
+        function getCategoryBadge(kategori) {
+            const colors = { Ringan: 'bg-slate-100 text-slate-700', Sederhana: 'bg-orange-100 text-orange-800', Berat: 'bg-purple-100 text-purple-800' };
+            return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold ${colors[kategori] || 'bg-slate-100'}">${kategori || '-'}</span>`;
         }
 
-        window.addSaksiInput = function(nama = '') {
-            saksiCount++;
-            const container = document.getElementById('saksiContainer');
-            if (!container) return;
-            const id = saksiCount;
-            const div = document.createElement('div');
-            div.id = `saksiRow_${id}`;
-            div.className = "flex items-center space-x-2";
-            div.innerHTML = `
-                <input type="text" class="saksiNamaInput w-full p-2 border border-slate-300 rounded-lg text-xs" placeholder="Cth: Saksi 1 - En. Rosli / Aiman (4 Cemerlang)" value="${nama}">
-                <button type="button" onclick="window.removeSaksiInput(${id})" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition" title="Padam Saksi">
-                    <i class="fa-solid fa-trash-can"></i>
-                </button>
-            `;
-            container.appendChild(div);
-        };
-
-        window.removeSaksiInput = function(id) {
-            const row = document.getElementById(`saksiRow_${id}`);
-            if (row) row.remove();
-        };
-
-        function getSaksiListFromForm() {
-            const rows = document.querySelectorAll('#saksiContainer > div');
-            const list = [];
-            rows.forEach(row => {
-                const val = row.querySelector('.saksiNamaInput')?.value.trim();
-                if (val) list.push(val);
-            });
-            return list;
+        function getStatusBadge(status) {
+            const colors = { 'Baru Dilaporkan': 'bg-red-100 text-red-700', 'Dalam Siasatan': 'bg-amber-100 text-amber-800', 'Menunggu Tindakan': 'bg-blue-100 text-blue-800', 'Selesai': 'bg-emerald-100 text-emerald-800' };
+            return `<span class="px-2.5 py-1 rounded-full text-xs font-bold ${colors[status] || 'bg-slate-100'}">${status || '-'}</span>`;
         }
 
-        function resetPelakuContainer() {
-            const container = document.getElementById('pelakuContainer');
-            if(container) container.innerHTML = '';
-            pelakuCount = 0;
-        }
-
-        window.addPelakuInput = function(nama = '', kelas = '', kesLalu = 0) {
-            pelakuCount++;
-            const container = document.getElementById('pelakuContainer');
-            if(!container) return;
-            const id = pelakuCount;
-            const div = document.createElement('div');
-            div.id = `pelakuRow_${id}`;
-            div.className = "grid grid-cols-1 sm:grid-cols-12 gap-2 text-xs bg-white p-3 rounded-xl border border-slate-200 shadow-sm relative";
-            div.innerHTML = `
-                <div class="sm:col-span-5">
-                    <label class="block text-slate-600 font-semibold mb-1">Nama Murid *</label>
-                    <input type="text" class="pelakuNamaInput w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500" placeholder="Cth: Muhammad Amir" value="${nama}" oninput="window.calculatePreviousCasesForRow(${id})">
-                </div>
-                <div class="sm:col-span-4">
-                    <label class="block text-slate-600 font-semibold mb-1">Tahun / Kelas *</label>
-                    <input type="text" class="pelakuKelasInput w-full p-2 border border-slate-300 rounded-lg" placeholder="Cth: 4 Cemerlang" value="${kelas}">
-                </div>
-                <div class="sm:col-span-2">
-                    <label class="block text-slate-600 font-semibold mb-1">Kes Lalu</label>
-                    <input type="number" id="pelakuKesLalu_${id}" class="pelakuKesLaluInput w-full p-2 bg-slate-200 font-bold text-slate-800 border border-slate-300 rounded-lg cursor-not-allowed" readonly value="${kesLalu}">
-                </div>
-                <div class="sm:col-span-1 flex items-end justify-center pb-0.5">
-                    <button type="button" onclick="window.removePelakuInput(${id})" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition" title="Padam Pelaku">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>
-                </div>
-            `;
-            container.appendChild(div);
-        };
-
-        window.removePelakuInput = function(id) {
-            const container = document.getElementById('pelakuContainer');
-            if (container && container.children.length <= 1) {
-                showToast("Setidaknya satu pelaku perlu diisi.");
-                return;
-            }
-            const row = document.getElementById(`pelakuRow_${id}`);
-            if(row) row.remove();
-        };
-
-        window.calculatePreviousCasesForRow = function(rowId) {
-            const row = document.getElementById(`pelakuRow_${rowId}`);
-            if (!row) return;
-            const nameInput = row.querySelector('.pelakuNamaInput');
-            const kesLaluInput = row.querySelector('.pelakuKesLaluInput');
-            const studentName = nameInput ? nameInput.value.trim().toLowerCase() : '';
-            if (!studentName) {
-                if (kesLaluInput) kesLaluInput.value = 0;
-                return;
-            }
-
-            let count = 0;
-            casesData.forEach(c => {
-                const pelakus = Array.isArray(c.pelaku) ? c.pelaku : [c.pelaku];
-                pelakus.forEach(p => {
-                    if (p && p.nama && p.nama.trim().toLowerCase() === studentName) {
-                        count++;
-                    }
-                });
-            });
-
-            if (kesLaluInput) kesLaluInput.value = count;
-        };
-
-        function getPelakuListFromForm() {
-            const rows = document.querySelectorAll('#pelakuContainer > div');
-            const list = [];
-            rows.forEach(row => {
-                const nama = row.querySelector('.pelakuNamaInput')?.value.trim();
-                const kelas = row.querySelector('.pelakuKelasInput')?.value.trim();
-                const kesLalu = parseInt(row.querySelector('.pelakuKesLaluInput')?.value) || 0;
-                if(nama) {
-                    list.push({ nama, kelas: kelas || '-', kesLalu });
-                }
-            });
-            return list;
-        }
-
-        function resetMangsaContainer() {
-            const container = document.getElementById('mangsaContainer');
-            if(container) container.innerHTML = '';
-            mangsaCount = 0;
-        }
-
-        window.addMangsaInput = function(nama = '', kelas = '', kecederaan = '') {
-            mangsaCount++;
-            const container = document.getElementById('mangsaContainer');
-            if(!container) return;
-            const id = mangsaCount;
-            const div = document.createElement('div');
-            div.id = `mangsaRow_${id}`;
-            div.className = "grid grid-cols-1 sm:grid-cols-12 gap-2 text-xs bg-white p-3 rounded-xl border border-slate-200 shadow-sm relative";
-            div.innerHTML = `
-                <div class="sm:col-span-4">
-                    <label class="block text-slate-600 font-semibold mb-1">Nama Mangsa</label>
-                    <input type="text" class="mangsaNamaInput w-full p-2 border border-slate-300 rounded-lg" placeholder="Cth: Luqman Hakim" value="${nama}">
-                </div>
-                <div class="sm:col-span-3">
-                    <label class="block text-slate-600 font-semibold mb-1">Tahun / Kelas</label>
-                    <input type="text" class="mangsaKelasInput w-full p-2 border border-slate-300 rounded-lg" placeholder="Cth: 4 Pintar" value="${kelas}">
-                </div>
-                <div class="sm:col-span-4">
-                    <label class="block text-slate-600 font-semibold mb-1">Kecederaan / Catatan</label>
-                    <input type="text" class="mangsaKecederaanInput w-full p-2 border border-slate-300 rounded-lg" placeholder="Cth: Lebam ringan" value="${kecederaan}">
-                </div>
-                <div class="sm:col-span-1 flex items-end justify-center pb-0.5">
-                    <button type="button" onclick="window.removeMangsaInput(${id})" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition" title="Padam Mangsa">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>
-                </div>
-            `;
-            container.appendChild(div);
-        };
-
-        window.removeMangsaInput = function(id) {
-            const row = document.getElementById(`mangsaRow_${id}`);
-            if(row) row.remove();
-        };
-
-        function getMangsaListFromForm() {
-            const rows = document.querySelectorAll('#mangsaContainer > div');
-            const list = [];
-            rows.forEach(row => {
-                const nama = row.querySelector('.mangsaNamaInput')?.value.trim();
-                const kelas = row.querySelector('.mangsaKelasInput')?.value.trim();
-                const kecederaan = row.querySelector('.mangsaKecederaanInput')?.value.trim();
-                if(nama) {
-                    list.push({ nama, kelas: kelas || '-', kecederaan: kecederaan || '-' });
-                }
-            });
-            return list.length > 0 ? list : [{ nama: '-', kelas: '-', kecederaan: '-' }];
-        }
-
-        window.handleFileUpload = function(e) {
-            const files = Array.from(e.target.files);
-            if (!files || files.length === 0) return;
-
-            files.forEach(file => {
-                const isImage = file.type.startsWith('image/');
-                if (isImage) {
-                    const reader = new FileReader();
-                    reader.onload = function(evt) {
-                        activeUploadedFiles.push({
-                            name: file.name,
-                            type: 'image',
-                            url: evt.target.result
-                        });
-                        renderUploadedEvidenceList();
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    activeUploadedFiles.push({
-                        name: file.name,
-                        type: 'file',
-                        url: ''
-                    });
-                    renderUploadedEvidenceList();
-                }
-            });
-        };
-
-        function renderUploadedEvidenceList() {
-            const listContainer = document.getElementById('evidencePreviewList');
-            if (!listContainer) return;
-            listContainer.innerHTML = '';
-
-            if (activeUploadedFiles.length === 0) {
-                listContainer.innerHTML = `<span class="text-xs text-slate-400 italic">Tiada fail dimuat naik lagi.</span>`;
-                return;
-            }
-
-            activeUploadedFiles.forEach((f, idx) => {
-                const div = document.createElement('div');
-                div.className = "relative bg-slate-100 border border-slate-200 p-2 rounded-lg flex items-center space-x-2 text-xs";
-                div.innerHTML = `
-                    <span class="font-medium text-slate-700 truncate max-w-[140px]">${f.name}</span>
-                    <button type="button" onclick="window.removeUploadedFile(${idx})" class="text-red-500 hover:text-red-700 ml-1">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
+        function renderRecentTable() {
+            const tbody = document.getElementById('recentCasesTableBody');
+            tbody.innerHTML = '';
+            casesData.slice(0, 5).forEach(c => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="py-3 px-4 font-mono font-bold">${c.id}</td>
+                    <td class="py-3 px-4 text-slate-500">${c.tarikh}</td>
+                    <td class="py-3 px-4 font-semibold">${c.namaKes}</td>
+                    <td class="py-3 px-4">${getPelakuDisplay(c.pelaku)}</td>
+                    <td class="py-3 px-4">${getCategoryBadge(c.kategori)}</td>
+                    <td class="py-3 px-4">${getStatusBadge(c.status)}</td>
+                    <td class="py-3 px-4 text-center">
+                        <button onclick="openDetailModal('${c.firestoreId || c.id}')" class="p-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg"><i class="fa-solid fa-eye text-xs"></i></button>
+                    </td>
                 `;
-                listContainer.appendChild(div);
+                tbody.appendChild(tr);
             });
         }
 
-        window.removeUploadedFile = function(index) {
-            activeUploadedFiles.splice(index, 1);
-            renderUploadedEvidenceList();
-        };
+        function renderAllCasesTable(list = null) {
+            const data = list || casesData;
+            const tbody = document.getElementById('allCasesTableBody');
+            tbody.innerHTML = '';
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-6 text-slate-400">Tiada rekod kes ditemui.</td></tr>';
+                return;
+            }
+            data.forEach(c => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="py-3.5 px-4 font-mono font-bold">${c.id}</td>
+                    <td class="py-3.5 px-4">${c.tarikh} <span class="text-slate-400 text-[10px]">${c.masa || ''}</span></td>
+                    <td class="py-3.5 px-4 font-semibold">${c.namaKes} <p class="text-[10px] text-slate-400">${c.lokasi}</p></td>
+                    <td class="py-3.5 px-4">${getPelakuDisplay(c.pelaku)}</td>
+                    <td class="py-3.5 px-4">${getCategoryBadge(c.kategori)}</td>
+                    <td class="py-3.5 px-4">${getStatusBadge(c.status)}</td>
+                    <td class="py-3.5 px-4 text-center">
+                        <button onclick="openDetailModal('${c.firestoreId || c.id}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-medium">Buka</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
 
-        window.resetFilters = function() {
+        function openDetailModal(id) {
+            currentViewingCaseId = id;
+            const c = casesData.find(item => (item.firestoreId === id || item.id === id));
+            if (!c) return;
+
+            document.getElementById('detailModalTitle').innerText = `Rekod Kes: ${c.id}`;
+            document.getElementById('detailModalBody').innerHTML = `
+                <div class="bg-slate-100 p-3 rounded-xl flex items-center justify-between">
+                    <span class="font-bold">Status Semasa:</span>
+                    <select id="quickStatusSelect" class="p-1.5 text-xs rounded-lg border bg-white font-semibold">
+                        <option value="Baru Dilaporkan" ${c.status === 'Baru Dilaporkan' ? 'selected' : ''}>Baru Dilaporkan</option>
+                        <option value="Dalam Siasatan" ${c.status === 'Dalam Siasatan' ? 'selected' : ''}>Dalam Siasatan</option>
+                        <option value="Menunggu Tindakan" ${c.status === 'Menunggu Tindakan' ? 'selected' : ''}>Menunggu Tindakan</option>
+                        <option value="Selesai" ${c.status === 'Selesai' ? 'selected' : ''}>Selesai</option>
+                    </select>
+                    <button onclick="updateQuickStatus('${c.firestoreId}')" class="bg-navy-900 text-white px-3 py-1.5 rounded-lg">Kemaskini Status</button>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-white p-3 rounded-xl border">
+                        <p class="font-bold border-b pb-1">Maklumat Kejadian</p>
+                        <p class="mt-2"><strong>Kes:</strong> ${c.namaKes}</p>
+                        <p><strong>Tarikh:</strong> ${c.tarikh} (${c.masa || '-'})</p>
+                        <p><strong>Lokasi:</strong> ${c.lokasi}</p>
+                    </div>
+                    <div class="bg-white p-3 rounded-xl border">
+                        <p class="font-bold border-b pb-1">Pelaku</p>
+                        <p class="mt-2">${getPelakuDisplay(c.pelaku)}</p>
+                    </div>
+                </div>
+                <div class="bg-white p-3 rounded-xl border">
+                    <p class="font-bold border-b pb-1">Siasatan</p>
+                    <p class="mt-2 bg-slate-50 p-2 rounded">${c.siasatan}</p>
+                </div>
+                <div class="bg-white p-3 rounded-xl border">
+                    <p class="font-bold border-b pb-1">Tindakan</p>
+                    <p class="mt-2">${c.catatanTindakan || 'Tiada catatan.'}</p>
+                </div>
+            `;
+            document.getElementById('modalDetailView').classList.remove('hidden');
+        }
+
+        function generatePDF(id) {
+            const c = casesData.find(item => (item.firestoreId === id || item.id === id));
+            if (!c) return;
+
+            document.getElementById('printNoKes').innerText = c.id;
+            document.getElementById('printTodayDate').innerText = new Date().toLocaleDateString('ms-MY');
+            document.getElementById('printValNamaKes').innerText = c.namaKes;
+            document.getElementById('printValKategoriLokasi').innerText = `${c.kategori} (${c.lokasi})`;
+            document.getElementById('printValPelaku').innerText = (c.pelaku || []).map(p => `${p.nama} (${p.kelas})`).join(', ');
+            document.getElementById('printValStatus').innerText = c.status;
+            document.getElementById('printValSiasatan').innerText = c.siasatan;
+            document.getElementById('printValCatatanTindakan').innerText = c.catatanTindakan || '-';
+
+            const element = document.getElementById('printableReportArea');
+            element.classList.remove('hidden');
+            html2pdf().set({ margin: 0.3, filename: `Laporan_${c.id}.pdf`, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } })
+                .from(element).save().then(() => element.classList.add('hidden'));
+        }
+
+        function handleGlobalSearch() {
+            const q = document.getElementById('globalSearchInput').value.toLowerCase();
+            const filtered = casesData.filter(c => {
+                const matchP = (c.pelaku || []).some(p => p.nama && p.nama.toLowerCase().includes(q));
+                return c.id.toLowerCase().includes(q) || c.namaKes.toLowerCase().includes(q) || matchP;
+            });
+            renderAllCasesTable(filtered);
+        }
+
+        function applyFilters() {
+            const kat = document.getElementById('filterKategori').value;
+            const status = document.getElementById('filterStatus').value;
+            const ting = document.getElementById('filterTingkatan').value;
+            const lok = document.getElementById('filterLokasi').value;
+
+            const filtered = casesData.filter(c => {
+                let m = true;
+                if (kat && c.kategori !== kat) m = false;
+                if (status && c.status !== status) m = false;
+                if (lok && c.lokasi !== lok) m = false;
+                if (ting) {
+                    const num = ting.replace('Tahun ', '');
+                    if (!(c.pelaku || []).some(p => p.kelas && p.kelas.includes(num))) m = false;
+                }
+                return m;
+            });
+            renderAllCasesTable(filtered);
+        }
+
+        function resetFilters() {
             document.getElementById('filterKategori').value = '';
             document.getElementById('filterStatus').value = '';
             document.getElementById('filterTingkatan').value = '';
             document.getElementById('filterLokasi').value = '';
             document.getElementById('globalSearchInput').value = '';
             renderAllCasesTable();
-        };
-
-        function renderRecentTable() {
-            const tbody = document.getElementById('recentCasesTableBody');
-            tbody.innerHTML = '';
-
-            const recentList = [...casesData].slice(0, 5);
-
-            recentList.forEach(c => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50/80 transition";
-                tr.innerHTML = `
-                    <td class="py-3 px-4 font-mono font-bold text-slate-800">${c.id}</td>
-                    <td class="py-3 px-4 text-slate-500">${c.tarikh}</td>
-                    <td class="py-3 px-4 font-semibold text-slate-900">${c.namaKes}</td>
-                    <td class="py-3 px-4">${getPelakuDisplay(c.pelaku)}</td>
-                    <td class="py-3 px-4">${getCategoryBadge(c.kategori)}</td>
-                    <td class="py-3 px-4">${getStatusBadge(c.status)}</td>
-                    <td class="py-3 px-4 text-slate-500 max-w-xs truncate">${c.catatanTindakan || '-'}</td>
-                    <td class="py-3 px-4 text-center">
-                        <button onclick="window.openDetailModal('${c.firestoreId}')" class="p-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 transition" title="Lihat Siasatan & Bukti">
-                            <i class="fa-solid fa-eye text-xs"></i>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
         }
-
-        function renderAllCasesTable(filteredList = null) {
-            const list = filteredList || casesData;
-            const tbody = document.getElementById('allCasesTableBody');
-            tbody.innerHTML = '';
-
-            if(list.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-slate-400 font-medium">Tiada rekod kes ditemui.</td></tr>`;
-                return;
-            }
-
-            list.forEach(c => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50/80 transition border-b border-slate-100";
-                tr.innerHTML = `
-                    <td class="py-3.5 px-4 font-mono font-bold text-slate-900">${c.id}</td>
-                    <td class="py-3.5 px-4">
-                        <p class="font-medium text-slate-800">${c.tarikh}</p>
-                        <p class="text-[10px] text-slate-400">${c.masa || ''}</p>
-                    </td>
-                    <td class="py-3.5 px-4">
-                        <p class="font-bold text-slate-800">${c.namaKes}</p>
-                        <p class="text-[10px] text-slate-400"><i class="fa-solid fa-location-dot mr-1"></i>${c.lokasi}</p>
-                    </td>
-                    <td class="py-3.5 px-4">
-                        <div class="font-semibold text-slate-900">${getPelakuDisplay(c.pelaku)}</div>
-                    </td>
-                    <td class="py-3.5 px-4">${getCategoryBadge(c.kategori)}</td>
-                    <td class="py-3.5 px-4">${getStatusBadge(c.status)}</td>
-                    <td class="py-3.5 px-4 text-center">
-                        <div class="flex items-center justify-center space-x-1">
-                            <button onclick="window.openDetailModal('${c.firestoreId}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium transition">
-                                <i class="fa-solid fa-folder-open mr-1"></i> Buka
-                            </button>
-                            <button onclick="window.generatePDF('${c.firestoreId}')" class="p-1.5 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg transition" title="Jana PDF">
-                                <i class="fa-solid fa-file-pdf text-xs"></i>
-                            </button>
-                            <button onclick="window.printSpecificCase('${c.firestoreId}')" class="p-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg transition" title="Cetak">
-                                <i class="fa-solid fa-print text-xs"></i>
-                            </button>
-                        </div>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        window.handleGlobalSearch = function() {
-            const query = document.getElementById('globalSearchInput').value.toLowerCase();
-            const filtered = casesData.filter(c => {
-                const pelakus = Array.isArray(c.pelaku) ? c.pelaku : [c.pelaku];
-                const matchPelaku = pelakus.some(p => p.nama && (p.nama.toLowerCase().includes(query) || (p.kelas && p.kelas.toLowerCase().includes(query))));
-                return c.id.toLowerCase().includes(query) || c.namaKes.toLowerCase().includes(query) || matchPelaku;
-            });
-
-            if(document.getElementById('view-senarai').classList.contains('hidden')) {
-                window.switchTab('senarai');
-            }
-            renderAllCasesTable(filtered);
-        };
-
-        window.applyFilters = function() {
-            const kat = document.getElementById('filterKategori').value;
-            const status = document.getElementById('filterStatus').value;
-            const tingkatan = document.getElementById('filterTingkatan').value;
-            const lokasi = document.getElementById('filterLokasi').value;
-
-            const filtered = casesData.filter(c => {
-                let match = true;
-                if(kat && c.kategori !== kat) match = false;
-                if(status && c.status !== status) match = false;
-                if(lokasi && c.lokasi !== lokasi) match = false;
-                if(tingkatan) {
-                    const pelakus = Array.isArray(c.pelaku) ? c.pelaku : [c.pelaku];
-                    const num = tingkatan.replace('Tahun ', '');
-                    const matchTahun = pelakus.some(p => p.kelas && p.kelas.includes(num));
-                    if(!matchTahun) match = false;
-                }
-                return match;
-            });
-
-            renderAllCasesTable(filtered);
-        };
-
-        window.openDetailModal = function(firestoreId) {
-            window.currentViewingCaseId = firestoreId;
-            const c = casesData.find(item => item.firestoreId === firestoreId);
-            if(!c) return;
-
-            document.getElementById('detailModalTitle').innerText = `Rekod Kes: ${c.id}`;
-            document.getElementById('detailBadgeStatus').innerHTML = getStatusBadge(c.status);
-
-            const saksiText = c.saksi && Array.isArray(c.saksi) ? c.saksi.join(', ') : (c.saksi || '-');
-            const pelakus = Array.isArray(c.pelaku) ? c.pelaku : [c.pelaku];
-            const mangsas = Array.isArray(c.mangsa) ? c.mangsa : [c.mangsa];
-
-            const body = document.getElementById('detailModalBody');
-            body.innerHTML = `
-                <div class="bg-slate-100 p-3 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-slate-200">
-                    <div class="flex items-center space-x-2">
-                        <span class="font-bold text-slate-700">Status Kes:</span>
-                        <select id="quickStatusSelect" class="p-1.5 text-xs rounded-lg border border-slate-300 font-semibold bg-white">
-                            <option value="Baru Dilaporkan" ${c.status === 'Baru Dilaporkan' ? 'selected' : ''}>Baru Dilaporkan</option>
-                            <option value="Dalam Siasatan" ${c.status === 'Dalam Siasatan' ? 'selected' : ''}>Dalam Siasatan</option>
-                            <option value="Menunggu Tindakan" ${c.status === 'Menunggu Tindakan' ? 'selected' : ''}>Menunggu Tindakan</option>
-                            <option value="Selesai" ${c.status === 'Selesai' ? 'selected' : ''}>Selesai</option>
-                        </select>
-                    </div>
-                    <button onclick="window.updateQuickStatus('${c.firestoreId}')" class="bg-navy-900 text-white px-3 py-1.5 rounded-lg font-medium text-xs hover:bg-slate-800 transition">
-                        Simpan Status Baru
-                    </button>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-2">
-                        <h4 class="font-bold text-slate-900 border-b pb-1 flex items-center justify-between">
-                            <span>Maklumat Kejadian</span>
-                            ${getCategoryBadge(c.kategori)}
-                        </h4>
-                        <p><strong>Nama Kes:</strong> ${c.namaKes}</p>
-                        <p><strong>Tarikh & Masa:</strong> ${c.tarikh} (${c.masa || 'N/A'})</p>
-                        <p><strong>Lokasi Kejadian:</strong> ${c.lokasi}</p>
-                    </div>
-
-                    <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-2">
-                        <h4 class="font-bold text-slate-900 border-b pb-1">Maklumat Pelapor</h4>
-                        <p><strong>Nama:</strong> ${c.pelapor.nama}</p>
-                        <p><strong>Jawatan:</strong> ${c.pelapor.jawatan}</p>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-2">
-                        <h4 class="font-bold text-slate-900 border-b pb-1">Pelaku / Tertuduh (${pelakus.length})</h4>
-                        <div class="space-y-2 divide-y divide-slate-100">
-                            ${pelakus.map((p, idx) => `
-                                <div class="${idx > 0 ? 'pt-2' : ''}">
-                                    <p><strong>Pelaku ${idx + 1}:</strong> ${p.nama} (${p.kelas})</p>
-                                    <p class="text-[11px] text-slate-500">Rekod Kes Terdahulu: <span class="bg-red-50 text-red-700 px-1.5 py-0.5 rounded font-bold">${p.kesLalu || 0} Kes</span></p>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-2">
-                        <h4 class="font-bold text-slate-900 border-b pb-1">Mangsa Kejadian (${mangsas.length})</h4>
-                        <div class="space-y-2 divide-y divide-slate-100">
-                            ${mangsas.map((m, idx) => `
-                                <div class="${idx > 0 ? 'pt-2' : ''}">
-                                    <p><strong>Mangsa ${idx + 1}:</strong> ${m.nama} ${m.kelas !== '-' ? `(${m.kelas})` : ''}</p>
-                                    <p class="text-[11px] text-slate-500">Catatan: ${m.kecederaan}</p>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-2">
-                    <h4 class="font-bold text-slate-900 border-b pb-1">Laporan Siasatan</h4>
-                    <p class="bg-slate-50 p-3 rounded-lg border border-slate-100 italic">${c.siasatan}</p>
-                    <div class="pt-2 text-[11px] text-slate-600">
-                        <p><strong>Saksi:</strong> ${saksiText}</p>
-                        <p><strong>Tarikh Siasatan:</strong> ${c.tarikhSiasatan || '-'}</p>
-                    </div>
-                </div>
-
-                <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-2">
-                    <h4 class="font-bold text-slate-900 border-b pb-1">Tindakan Disiplin</h4>
-                    <p><strong>Tindakan Murid:</strong> ${c.tindakanMurid?.length ? c.tindakanMurid.join(', ') : 'Tiada'}</p>
-                    <p><strong>Tindakan Pemulihan:</strong> ${c.tindakanPemulihan?.length ? c.tindakanPemulihan.join(', ') : 'Tiada'}</p>
-                    <p><strong>Catatan:</strong> ${c.catatanTindakan || '-'}</p>
-                </div>
-            `;
-
-            document.getElementById('modalDetailView').classList.remove('hidden');
-        };
-
-        function preparePrintableContent(firestoreId) {
-            const c = casesData.find(item => item.firestoreId === firestoreId);
-            if(!c) return null;
-
-            document.getElementById('printNoKes').innerText = c.id;
-            document.getElementById('printTodayDate').innerText = new Date().toLocaleDateString('ms-MY');
-            document.getElementById('printValNoKes').innerText = c.id;
-            document.getElementById('printValTarikhMasa').innerText = `${c.tarikh} (${c.masa || '-'})`;
-            document.getElementById('printValNamaKes').innerText = c.namaKes;
-            document.getElementById('printValKategoriLokasi').innerText = `${c.kategori} (${c.lokasi})`;
-            document.getElementById('printValStatus').innerText = c.status;
-
-            const tbodyIndividu = document.getElementById('printTbodyIndividu');
-            let rowsHtml = `
-                <tr>
-                    <td class="border border-slate-300 p-1.5 font-bold bg-slate-50">Pelapor</td>
-                    <td class="border border-slate-300 p-1.5">${c.pelapor.nama}</td>
-                    <td class="border border-slate-300 p-1.5">${c.pelapor.jawatan}</td>
-                    <td class="border border-slate-300 p-1.5">-</td>
-                </tr>
-            `;
-
-            const pelakus = Array.isArray(c.pelaku) ? c.pelaku : [c.pelaku];
-            pelakus.forEach((p, i) => {
-                rowsHtml += `
-                    <tr>
-                        <td class="border border-slate-300 p-1.5 font-bold bg-slate-50">Pelaku #${i+1}</td>
-                        <td class="border border-slate-300 p-1.5 font-semibold">${p.nama}</td>
-                        <td class="border border-slate-300 p-1.5">${p.kelas}</td>
-                        <td class="border border-slate-300 p-1.5">${p.kesLalu || 0} kes lampau</td>
-                    </tr>
-                `;
-            });
-
-            tbodyIndividu.innerHTML = rowsHtml;
-            document.getElementById('printValSiasatan').innerText = c.siasatan;
-            document.getElementById('printValSaksi').innerText = c.saksi?.join(', ') || '-';
-
-            const allTindakan = [...(c.tindakanMurid || []), ...(c.tindakanPemulihan || [])];
-            document.getElementById('printValTindakanDikenakan').innerText = allTindakan.length > 0 ? allTindakan.join(', ') : 'Tiada';
-            document.getElementById('printValCatatanTindakan').innerText = c.catatanTindakan || '-';
-            document.getElementById('printSignPelapor').innerText = `( ${c.pelapor.nama} )`;
-
-            return c;
-        }
-
-        window.printSpecificCase = function(firestoreId) {
-            preparePrintableContent(firestoreId);
-            const printArea = document.getElementById('printableReportArea');
-            printArea.classList.remove('hidden');
-
-            window.print();
-
-            setTimeout(() => {
-                printArea.classList.add('hidden');
-            }, 1000);
-        };
-
-        window.generatePDF = function(firestoreId) {
-            const caseData = preparePrintableContent(firestoreId);
-            if(!caseData) return;
-
-            const element = document.getElementById('printableReportArea');
-            element.classList.remove('hidden');
-
-            const opt = {
-                margin:       0.3,
-                filename:     `Laporan_Disiplin_${caseData.id}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-            };
-
-            showToast("Menjana fail PDF...");
-
-            html2pdf().set(opt).from(element).save().then(() => {
-                element.classList.add('hidden');
-                showToast("Laporan PDF berjaya dimuat turun!");
-            }).catch(err => {
-                element.classList.add('hidden');
-                console.error(err);
-                showToast("Ralat penjanaan PDF. Sila guna fungsi Cetak.");
-            });
-        };
 
         function renderCharts() {
             const katCounts = { Ringan: 0, Sederhana: 0, Berat: 0 };
+            const misconductCounts = {};
             casesData.forEach(c => {
-                if(katCounts[c.kategori] !== undefined) katCounts[c.kategori]++;
-                else katCounts['Sederhana']++;
+                if (katCounts[c.kategori] !== undefined) katCounts[c.kategori]++;
+                misconductCounts[c.namaKes] = (misconductCounts[c.namaKes] || 0) + 1;
             });
 
             const ctx1 = document.getElementById('categoryChart').getContext('2d');
-            if(categoryChartInstance) categoryChartInstance.destroy();
-
+            if (categoryChartInstance) categoryChartInstance.destroy();
             categoryChartInstance = new Chart(ctx1, {
                 type: 'doughnut',
                 data: {
                     labels: ['Ringan', 'Sederhana', 'Berat'],
-                    datasets: [{
-                        data: [katCounts.Ringan, katCounts.Sederhana, katCounts.Berat],
-                        backgroundColor: ['#94a3b8', '#f97316', '#a855f7'],
-                        borderWidth: 2,
-                        borderColor: '#ffffff'
-                    }]
+                    datasets: [{ data: [katCounts.Ringan, katCounts.Sederhana, katCounts.Berat], backgroundColor: ['#94a3b8', '#f97316', '#a855f7'] }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom', labels: { font: { size: 11 } } }
-                    }
-                }
-            });
-
-            const misconductCounts = {};
-            casesData.forEach(c => {
-                misconductCounts[c.namaKes] = (misconductCounts[c.namaKes] || 0) + 1;
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
             });
 
             const ctx2 = document.getElementById('misconductChart').getContext('2d');
-            if(misconductChartInstance) misconductChartInstance.destroy();
-
+            if (misconductChartInstance) misconductChartInstance.destroy();
             misconductChartInstance = new Chart(ctx2, {
                 type: 'bar',
                 data: {
                     labels: Object.keys(misconductCounts),
-                    datasets: [{
-                        label: 'Bilangan Kes',
-                        data: Object.values(misconductCounts),
-                        backgroundColor: '#2563eb',
-                        borderRadius: 6
-                    }]
+                    datasets: [{ label: 'Bilangan Kes', data: Object.values(misconductCounts), backgroundColor: '#2563eb', borderRadius: 6 }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { beginAtZero: true, ticks: { stepSize: 1 } },
-                        x: { ticks: { font: { size: 10 } } }
-                    }
-                }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
             });
         }
 
         function showToast(msg) {
             const toast = document.getElementById('toast');
-            document.getElementById('toastMsg').innerText = msg;
+            toast.querySelector('span').innerText = msg;
             toast.classList.remove('translate-y-20', 'opacity-0');
-            setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3500);
         }
+
+        // Panggil semasa mula
+        window.onload = function() {
+            updateDashboardMetrics();
+            renderRecentTable();
+            renderAllCasesTable();
+            renderCharts();
+        };
     </script>
 </body>
 </html>
